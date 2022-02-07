@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31729.503
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "TopicModelingSearchEngine", "TopicModelingSearchEngine\TopicModelingSearchEngine.pyproj", "{DE99BF7A-2AAE-47AE-B784-057CE7EEC5E9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DE99BF7A-2AAE-47AE-B784-057CE7EEC5E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE99BF7A-2AAE-47AE-B784-057CE7EEC5E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {233FBD87-935F-485F-B108-20F70647BE14}
+	EndGlobalSection
+EndGlobal
