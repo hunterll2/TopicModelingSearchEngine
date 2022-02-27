@@ -19,7 +19,7 @@ def get_embedding_w2v(w2v_model, doc_tokens):
     else:
         for tok in doc_tokens:
             if tok in w2v_model.wv.index_to_key:
-                embeddings.append(w2v_model.wv.word_vec(tok))
+                embeddings.append(w2v_model.wv.get_vector(tok))
             else:
                 embeddings.append(np.random.rand(300))
         
@@ -36,28 +36,35 @@ def ranking_ir(corpus, vector):
 
 def train():
     # Get corpus
-    print("Select corpus: ")
-    print("- cleaned corpus (50,000)")
-    corpus_name = input(">")
+    corpus = pickle.load(open(constants.CLEANED_CORPUS_TABLE, "rb"))
 
-    corpus = preprocess.get_corpus(corpus_name)
-
+    #
     txts = corpus['cleaned']
     train_data=[]
     for i in txts:
         train_data.append(i.split())
 
+    # Get user config data
+    print("\nEnter config data:")
+    vector_size = int(input("vector_size (300)>"))
+    min_count = int(input("min_count (2)>"))
+    window = float(input("window (5)>"))
+    sg = float(input("sg (1)>"))
+    workers = float(input("workers (4)>"))
+
+    # Saving options
+    answer = input("\nSave the trained model as default? (y/n)>")
+
+    if answer.lower() != "y":
+        model_name = input("Enter model name >")
+
     # traind w2v model
     print("\nStart training word2vec model")
 
     start = time.time()
-    w2v_model = Word2Vec(train_data, vector_size=300, min_count=2, window=5, sg=1, workers=4)
+    w2v_model = Word2Vec(train_data, vector_size=vector_size, min_count=min_count, window=window, sg=sg, workers=workers)
     end = time.time()
     print('Time to train the model: %0.2fs' % (end - start))
-
-    print("\nEnter w2v trained model name: ")
-    w2v_name = input(">")
-    w2v_model.save(w2v_name)
 
     # Create corpus vectors
     print("\nStart createing corpus vectors")
@@ -67,60 +74,45 @@ def train():
     end = time.time()
     print('Time to create vectors: %0.2fs' % (end - start))
 
-    pickle.dump( corpus_vectros, open( w2v_name+"_vectors", "wb" ) )
+    # Saving
+    if answer.lower() == "y":
+        w2v_model.save("dataset/"+constants.W2V_MODEL)
+        pickle.dump( corpus_vectros, open("dataset/"+w2v_name+"_vectors", "wb" ) )
+    else:
+        w2v_model.save("_dataset/"+model_name)
+        pickle.dump( corpus_vectros, open("_dataset/"+w2v_name+"_vectors", "wb" ) )
 
-    # finish
+    #
     print("\nThe model has been trained.")
-    model_data = {
-        "corpus_name":corpus_name,
-        "w2v_name":w2v_name,
-        "corpus_vectros_name":w2v_name+"_vectors"
-    }
-    pickle.dump( model_data, open( w2v_name+"_data", "wb" ) )
     return
 
 def search():
     # load trained model
-    print("Select trained model: ")
-    print("- w2v_model_50_data")
-    #saved_model_name = input(">")
-    saved_model_name = "w2v_model_50_data"
-    model_data = pickle.load(open(saved_model_name, "rb"))
-
-    corpus = pickle.load(open(model_data['corpus_name'], "rb"))
+    corpus = pickle.load(open("dataset/"+constants.CLEANED_CORPUS_TABLE, "rb"))
     corpus = corpus.dropna()
 
-    w2v_model = Word2Vec.load(model_data['w2v_name'])
+    w2v_model = Word2Vec.load("dataset/"+constants.W2V_MODEL)
+    corpus['vector'] = pickle.load(open("dataset/"+constants.W2V_MODEL+"_vectors", "rb"))
     
-    #corpus_vectros = pickle.load(open(model_data['corpus_vectros_name'], "rb"))
-    #corpus['vector'] = corpus_vectros
+    #
+    while(True):
+        query = input("\nEnter seaech query>")
 
-    print("strat createing corpus vectors")
-    start = time.time()
-    corpus['vector'] = corpus['cleaned'].apply(lambda x :get_embedding_w2v(w2v_model, x.split()))
-    pickle.dump( corpus['vector'], open( "corpus_vectros_50", "wb" ) )
-    end = time.time()
-    print('Time to create vectors: %0.2fs' % (end - start))
+        # pre-process Query
+        query=preprocess.clean(query)
 
-    
+        # generating vector
+        vector=get_embedding_w2v(w2v_model, query.split())
 
-    print("Enter seaech query: ")
-    query = input(">")
+        #
+        start = time.time()
+        result = ranking_ir(corpus, vector)
+        end = time.time()
+        print('Time to search: %0.2fs' % (end - start))
 
-    # pre-process Query
-    query=preprocess.clean(query)
 
-    # generating vector
-    vector=get_embedding_w2v(w2v_model, query.split())
-
-    start = time.time()
-    result = ranking_ir(corpus, vector)
-    end = time.time()
-    print('Time to search: %0.2fs' % (end - start))
-
-    print(tabulate(result, headers = 'keys', tablefmt = 'psql'))
-
-    # show result
-    print("done")
+        # show result
+        print(tabulate(result, headers = 'keys', tablefmt = 'psql'))
+    return
 
 search()

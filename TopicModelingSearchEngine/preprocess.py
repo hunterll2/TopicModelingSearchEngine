@@ -13,9 +13,7 @@ logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=lo
 # Tokenizer
 from gensim.utils import simple_tokenize
 
-
 ###### Helpers Funcs
-
 contractions_dict = { "ain't": "are not","'s":" is","aren't": "are not","can't": "can not","can't've": "cannot have",
 "'cause": "because","could've": "could have","couldn't": "could not","couldn't've": "could not have",
 "didn't": "did not","doesn't": "does not","don't": "do not","hadn't": "had not","hadn't've": "had not have",
@@ -57,29 +55,8 @@ def clean_text(text):
     text=re.sub('[^a-z]',' ',text)
     return text
 
-
 ###### Model Funcs
-
-last_num = 50000;
-
-def get_txts_cleand(ver = "new", num_docs = 1):
-    if (ver == 'last'):
-        return pickle.load(open("txts_cleand_"+str(last_num), "rb"))
-    else:
-        create_new(num_docs)
-        return pickle.load(open("txts_cleand_"+str(last_num), "rb"))
-
-def get_corpus(ver = 'new', num_docs = 1):
-    if (ver == 'last'):
-        return pickle.load(open("sample_corpus_"+str(last_num), "rb"))
-    elif (len(ver)):
-        return pickle.load(open(ver, "rb"))
-    else:
-        create_new(num_docs)
-        return pickle.load(open("sample_corpus_"+str(last_num), "rb"))
-
 def create_new(num):
-
     df = pd.read_table('./dataset/sample_corpus.tsv', header=None, encoding="latin1")
     df = df.iloc[:num]
     df.columns=['docid','url','title','body']
@@ -98,8 +75,7 @@ def create_new(num):
     pickle.dump( txts, open( "txts_cleand_"+str(num), "wb" ) )
     pickle.dump( df, open( "sample_corpus_"+str(num), "wb" ) )
 
-    global last_num;
-    last_num = num;
+    return
 
 def clean(txt):
     cleand = []

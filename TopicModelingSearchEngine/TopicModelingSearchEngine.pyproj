@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>de99bf7a-2aae-47ae-b784-057ce7eec5e9</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>lda.py</StartupFile>
+    <StartupFile>word2vec.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
