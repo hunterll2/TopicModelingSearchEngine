@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>de99bf7a-2aae-47ae-b784-057ce7eec5e9</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>training.py</StartupFile>
+    <StartupFile>lda.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -21,16 +21,40 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="online.py">
+    <Compile Include="archive\search.py" />
+    <Compile Include="archive\online.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="training.py" />
+    <Compile Include="constants.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="preprocess.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="archive\search_.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="word2vec.py" />
+    <Compile Include="archive\search_1.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="archive\search_md.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="lda.py" />
+    <Compile Include="archive\training.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="dataset\" />
+    <Folder Include="archive\" />
+    <Folder Include="_dataset\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="dataset\enwiki-20170820.db" />
+    <Content Include="dataset\msmarco-docs.tsv" />
+    <Content Include="dataset\msmarco-doctrain-top100" />
+    <Content Include="dataset\queries.doctrain.tsv" />
+    <Content Include="dataset\sample_corpus.tsv" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

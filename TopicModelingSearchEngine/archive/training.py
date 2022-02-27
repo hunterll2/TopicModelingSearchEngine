@@ -8,6 +8,7 @@ import numpy as np
 import logging
 import time
 import re
+import preprocess
 
 # Tokenizer
 from gensim.utils import simple_tokenize
@@ -61,7 +62,7 @@ def get_article(article_id):
 select = '''select distinct article_id from articles'''
 article_ids, _ = get_query(select)
 article_ids = [article_id[0] for article_id in article_ids]
-sample_article_ids = article_ids[:100]
+sample_article_ids = article_ids[:10]
 
 # Fetch each article text and perform preprocess
 articles = []
