@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>de99bf7a-2aae-47ae-b784-057ce7eec5e9</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>word2vec.py</StartupFile>
+    <StartupFile>main.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -28,6 +28,7 @@
     <Compile Include="constants.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="main.py" />
     <Compile Include="preprocess.py">
       <SubType>Code</SubType>
     </Compile>

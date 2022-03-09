@@ -5,8 +5,8 @@ import pickle
 import logging
 import pandas as pd
 
-nlp = spacy.load('en_core_web_sm', disable=['ner','parser'])
-nlp.max_length=5000000
+nlp = spacy.load("en_core_web_sm")
+#nlp.max_length=5000000
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 

@@ -48,10 +48,12 @@ def train():
 #dictionary = Dictionary(articles)
 #corpus = [dictionary.doc2bow(article) for article in articles]
 
-lda = LdaModel.load("dataset/"+constants.LDA_MODEL)
+#lda = LdaModel.load("dataset/"+constants.LDA_MODEL)
 
-for i in range(lda.num_topics):
-    print(lda.show_topic(i))
+#for i in range(lda.num_topics):
+#    print(lda.show_topic(i))
+
+
 
 print()
 

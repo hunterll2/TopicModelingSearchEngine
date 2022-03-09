@@ -28,7 +28,7 @@ def get_embedding_w2v(w2v_model, doc_tokens):
 
 def ranking_ir(corpus, vector):
   # ranking documents
-  documents=corpus[['docid','title','body']].copy()
+  documents=corpus[['docid','title','body', 'cleaned']].copy()
   documents['similarity']=corpus['vector'].apply(lambda x: cosine_similarity(np.array(vector).reshape(1, -1), np.array(x).reshape(1, -1)).item())
   documents.sort_values(by='similarity', ascending=False, inplace=True)
   
@@ -86,7 +86,7 @@ def train():
     print("\nThe model has been trained.")
     return
 
-def search():
+def search(query):
     # load trained model
     corpus = pickle.load(open("dataset/"+constants.CLEANED_CORPUS_TABLE, "rb"))
     corpus = corpus.dropna()
@@ -95,24 +95,25 @@ def search():
     corpus['vector'] = pickle.load(open("dataset/"+constants.W2V_MODEL+"_vectors", "rb"))
     
     #
-    while(True):
-        query = input("\nEnter seaech query>")
+    #query = input("\nEnter seaech query>")
 
-        # pre-process Query
-        query=preprocess.clean(query)
+    # pre-process Query
+    query=preprocess.clean(query)
 
-        # generating vector
-        vector=get_embedding_w2v(w2v_model, query.split())
+    # generating vector
+    vector=get_embedding_w2v(w2v_model, query.split())
 
-        #
-        start = time.time()
-        result = ranking_ir(corpus, vector)
-        end = time.time()
-        print('Time to search: %0.2fs' % (end - start))
+    #
+    start = time.time()
+    result = ranking_ir(corpus, vector)
+    end = time.time()
+    print('Time to search: %0.2fs' % (end - start))
 
+    # show result
+    # print(tabulate(result, headers = 'keys', tablefmt = 'psql'))
 
-        # show result
-        print(tabulate(result, headers = 'keys', tablefmt = 'psql'))
-    return
+    return result
 
-search()
+#r = search("product")
+
+print()
