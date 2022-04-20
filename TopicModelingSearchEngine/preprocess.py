@@ -2,16 +2,12 @@ import nltk
 import re
 import spacy
 import pickle
-import logging
 import pandas as pd
 
 nlp = spacy.load("en_core_web_sm")
-#nlp.max_length=5000000
 
-logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
-# Tokenizer
-from gensim.utils import simple_tokenize
+
 
 ###### Helpers Funcs
 contractions_dict = { "ain't": "are not","'s":" is","aren't": "are not","can't": "can not","can't've": "cannot have",
@@ -62,8 +58,8 @@ def create_new(num):
     df.columns=['docid','url','title','body']
     df = df.dropna()
 
-    df['cleaned']=df['body'].apply(lambda x:x.lower())
-    df['cleaned']=df['cleaned'].apply(lambda x:expand_contractions(x))
+    df['cleaned']=df['body'].apply(lambda x: x.lower())
+    df['cleaned']=df['cleaned'].apply(lambda x: expand_contractions(x))
     df['cleaned']=df['cleaned'].apply(lambda x: clean_text(x))
     df['cleaned']=df['cleaned'].apply(lambda x: re.sub(' +',' ',x))
     df['cleaned']=df['cleaned'].apply(lambda x: [token.lemma_ for token in list(nlp(x)) if token.is_stop==False])

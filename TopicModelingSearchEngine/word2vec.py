@@ -1,14 +1,12 @@
 import numpy as np
 from gensim.models import Word2Vec
-from sklearn.metrics.pairwise import cosine_similarity
 import time
 import pickle
-from tabulate import tabulate
+from sklearn.metrics.pairwise import cosine_similarity
 
-import logging
-logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+#import logging
+#logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
-import preprocess
 import constants
 
 def get_embedding_w2v(w2v_model, doc_tokens):
@@ -86,34 +84,20 @@ def train():
     print("\nThe model has been trained.")
     return
 
-def search(query):
-    # load trained model
-    corpus = pickle.load(open("dataset/"+constants.CLEANED_CORPUS_TABLE, "rb"))
-    corpus = corpus.dropna()
+# load trained model
+#corpus = pickle.load(open("dataset/"+constants.CLEANED_CORPUS_TABLE, "rb"))
+#corpus = corpus.dropna()
+w2v_model = Word2Vec.load("dataset/"+constants.W2V_MODEL)
+#corpus['vector'] = pickle.load(open("dataset/"+constants.W2V_MODEL+"_vectors", "rb"))
 
-    w2v_model = Word2Vec.load("dataset/"+constants.W2V_MODEL)
-    corpus['vector'] = pickle.load(open("dataset/"+constants.W2V_MODEL+"_vectors", "rb"))
-    
-    #
-    #query = input("\nEnter seaech query>")
-
-    # pre-process Query
-    query=preprocess.clean(query)
-
+def search(corpus, query):
     # generating vector
-    vector=get_embedding_w2v(w2v_model, query.split())
+    vector = get_embedding_w2v(w2v_model, query.split())
 
     #
-    start = time.time()
     result = ranking_ir(corpus, vector)
-    end = time.time()
-    print('Time to search: %0.2fs' % (end - start))
-
-    # show result
-    # print(tabulate(result, headers = 'keys', tablefmt = 'psql'))
 
     return result
 
 #r = search("product")
-
-print()
+# print(tabulate(result, headers = 'keys', tablefmt = 'psql'))

@@ -3,8 +3,8 @@ from gensim.models import LdaModel
 import time
 import pickle
 
-import logging
-logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+#import logging
+#logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
 import preprocess
 import constants

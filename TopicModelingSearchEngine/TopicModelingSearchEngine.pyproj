@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>de99bf7a-2aae-47ae-b784-057ce7eec5e9</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>main.py</StartupFile>
+    <StartupFile>test.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -35,6 +35,10 @@
     <Compile Include="archive\search_.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="archive\tf_idf.py" />
+    <Compile Include="archive\tf_idf_2.py" />
+    <Compile Include="test.py" />
+    <Compile Include="tf_idf.py" />
     <Compile Include="word2vec.py" />
     <Compile Include="archive\search_1.py">
       <SubType>Code</SubType>
