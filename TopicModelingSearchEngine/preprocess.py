@@ -1,15 +1,10 @@
-import nltk
 import re
 import spacy
-import pickle
-import pandas as pd
-
 nlp = spacy.load("en_core_web_sm")
+import pickle
+from gensim.utils import simple_tokenize
 
-
-
-
-###### Helpers Funcs
+#
 contractions_dict = { "ain't": "are not","'s":" is","aren't": "are not","can't": "can not","can't've": "cannot have",
 "'cause": "because","could've": "could have","couldn't": "could not","couldn't've": "could not have",
 "didn't": "did not","doesn't": "does not","don't": "do not","hadn't": "had not","hadn't've": "had not have",
@@ -39,6 +34,7 @@ contractions_dict = { "ain't": "are not","'s":" is","aren't": "are not","can't":
 
 contractions_re=re.compile('(%s)' % '|'.join(contractions_dict.keys()))
 
+# Module functions
 def expand_contractions(text,contractions_dict=contractions_dict):
     def replace(match):
         return contractions_dict[match.group(0)]
@@ -50,28 +46,6 @@ def clean_text(text):
     text=re.sub(r"http\s+", "", text)
     text=re.sub('[^a-z]',' ',text)
     return text
-
-###### Model Funcs
-def create_new(num):
-    df = pd.read_table('./dataset/sample_corpus.tsv', header=None, encoding="latin1")
-    df = df.iloc[:num]
-    df.columns=['docid','url','title','body']
-    df = df.dropna()
-
-    df['cleaned']=df['body'].apply(lambda x: x.lower())
-    df['cleaned']=df['cleaned'].apply(lambda x: expand_contractions(x))
-    df['cleaned']=df['cleaned'].apply(lambda x: clean_text(x))
-    df['cleaned']=df['cleaned'].apply(lambda x: re.sub(' +',' ',x))
-    df['cleaned']=df['cleaned'].apply(lambda x: [token.lemma_ for token in list(nlp(x)) if token.is_stop==False])
-    df['cleaned']=df['cleaned'].apply(lambda x: [token for token in x if len(token)>=3])
-    df['cleaned']=df['cleaned'].apply(lambda x: ' '.join([str(e) for e in x]))
-
-    txts = [list(simple_tokenize(x)) for x in df['cleaned'].values]
-
-    pickle.dump( txts, open( "txts_cleand_"+str(num), "wb" ) )
-    pickle.dump( df, open( "sample_corpus_"+str(num), "wb" ) )
-
-    return
 
 def clean(txt):
     cleand = []
@@ -88,3 +62,23 @@ def clean(txt):
         cleand.append(clean_token)
 
     return ' '.join([str(e) for e in cleand])
+
+def create_new(df, num = 50000):
+    df = df.iloc[:num]
+    df.columns=['docid','url','title','body']
+    df = df.dropna()
+
+    df['cleaned']=df['body'].apply(lambda x: x.lower())
+    df['cleaned']=df['cleaned'].apply(lambda x: expand_contractions(x))
+    df['cleaned']=df['cleaned'].apply(lambda x: clean_text(x))
+    df['cleaned']=df['cleaned'].apply(lambda x: re.sub(' +',' ',x))
+    df['cleaned']=df['cleaned'].apply(lambda x: [token.lemma_ for token in list(nlp(x)) if token.is_stop==False])
+    df['cleaned']=df['cleaned'].apply(lambda x: [token for token in x if len(token)>=3])
+    df['cleaned']=df['cleaned'].apply(lambda x: ' '.join([str(e) for e in x]))
+
+    txts = [list(simple_tokenize(x)) for x in df['cleaned'].values]
+
+    pickle.dump( txts, open( "dataset/cleaned_corpus_list_"+str(num), "wb" ) )
+    pickle.dump( df, open( "dataset/cleaned_corpus_table_"+str(num), "wb" ) )
+
+    return

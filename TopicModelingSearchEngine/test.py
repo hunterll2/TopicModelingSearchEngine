@@ -7,7 +7,7 @@ import preprocess
 
 from tf_idf import search as search_tfidf
 from word2vec import search as search_word2vec
-from main import searching as search_topic
+from _main import searching as search_topic
 
 from tf_idf import show_similar_documents
 
