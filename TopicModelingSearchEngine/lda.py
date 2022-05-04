@@ -3,8 +3,7 @@ from gensim.models import LdaModel
 import constants
 
 def train(corpus):
-    # load data
-    #articles = pickle.load(open("dataset/"+constants.CLEANED_CORPUS_LIST, "rb"))
+    # make list of docs
     articles = [x for x in corpus['cleaned']]
 
     # Create Dictionary

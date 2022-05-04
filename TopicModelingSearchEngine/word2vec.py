@@ -1,6 +1,5 @@
 import numpy as np
 from gensim.models import Word2Vec
-import time
 import pickle
 from sklearn.metrics.pairwise import cosine_similarity
 import constants
@@ -21,14 +20,8 @@ def get_embedding_w2v(w2v_model, doc_tokens):
         return np.mean(embeddings, axis=0)
 
 def train(corpus):
-    # Get corpus
-    #corpus = pickle.load(open(constants.CLEANED_CORPUS_TABLE, "rb"))
-
     #
-    txts = corpus['cleaned']
-    train_data=[]
-    for i in txts:
-        train_data.append(i.split())
+    txts = [txt.split() for txt in corpus['cleaned']]
 
     # Get user config data
     print("\nEnter config data:")
@@ -40,26 +33,16 @@ def train(corpus):
 
     # traind w2v model
     print("\nStart training word2vec model")
-
-    start = time.time()
-    w2v_model = Word2Vec(train_data, vector_size=vector_size, min_count=min_count, window=window, sg=sg, workers=workers)
-    end = time.time()
-    print('Time to train the model: %0.2fs' % (end - start))
+    w2v_model = Word2Vec(txts, vector_size=vector_size, min_count=min_count, window=window, sg=sg, workers=workers)
 
     # Create corpus vectors
     print("\nStart createing corpus vectors")
-
-    start = time.time()
-    corpus_vectros = corpus['vector'] = corpus['cleaned'].apply(lambda x :get_embedding_w2v(x.split()))
-    end = time.time()
-    print('Time to create vectors: %0.2fs' % (end - start))
+    corpus['vector'] = corpus['cleaned'].apply(lambda x :get_embedding_w2v(x.split()))
 
     # Saving
     w2v_model.save("dataset/"+constants.W2V_MODEL)
-    pickle.dump( corpus_vectros, open("dataset/"+constants.W2V_MODEL+"_vectors", "wb" ) )
+    pickle.dump( corpus, open("dataset/"+constants.CLEANED_CORPUS_TABLE, "wb" ) )
 
-    #
-    print("\nThe model has been trained.")
     return
 
 def search(corpus, w2v_model, query):
