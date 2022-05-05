@@ -29,7 +29,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="main.py" />
-    <Compile Include="_main.py" />
+    <Compile Include="archive\_main.py" />
     <Compile Include="preprocess.py">
       <SubType>Code</SubType>
     </Compile>
@@ -38,7 +38,7 @@
     </Compile>
     <Compile Include="archive\tf_idf.py" />
     <Compile Include="archive\tf_idf_2.py" />
-    <Compile Include="test.py" />
+    <Compile Include="archive\test.py" />
     <Compile Include="tf_idf.py" />
     <Compile Include="word2vec.py" />
     <Compile Include="archive\search_1.py">
