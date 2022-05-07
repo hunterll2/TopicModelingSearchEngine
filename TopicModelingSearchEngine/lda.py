@@ -1,6 +1,5 @@
 from gensim.corpora import Dictionary
 from gensim.models import LdaModel
-import constants
 
 def train(corpus):
     # make list of docs
@@ -24,6 +23,6 @@ def train(corpus):
     lda = LdaModel(corpus=corpus, id2word=dictionary, num_topics=num_topics, passes=passes, alpha=alpha, eta=eta)
 
     # Saving
-    lda.save("dataset/"+constants.LDA_MODEL)
+    lda.save("dataset/lda_model")
 
     return

@@ -1,26 +1,17 @@
 import pickle
 import pandas as pd
+import numpy as np
 import spacy
 nlp = spacy.load("en_core_web_sm")
-import numpy as np
 
 from sklearn.metrics.pairwise import cosine_similarity
 from gensim.utils import simple_tokenize
-from gensim.corpora import Dictionary
-from gensim.models import Word2Vec
 
 import lda
+import tf_idf
+import word2vec
 
-import constants
 import preprocess as p
-
-from tf_idf import train as train_tf_idf
-from tf_idf import search as search_tfidf
-
-from lda import train as train_topic
-
-from word2vec import train as train_word2vec
-from word2vec import search as search_word2vec
 
 # Search methods
 def search_topic(docs, lda_model, dictionary, result, numRes):
@@ -62,84 +53,79 @@ def search_topic(docs, lda_model, dictionary, result, numRes):
 #
 def print_result(df, top_n = 10):
     for i in range(0, top_n):
-        print('\nDoc {} ({}% Similarity)'.format(i+1, round(df['sim'][i], 2)))
-        print('Title: {}\nContent: {}'.format(df['title'][i], df['body'][i]))
-    return
+        sim = df['sim'][i]
+        title = df['title'][i]
+        body = df['body'][i]
+
+        print('\nDoc {} ({}% Similarity)'.format(i+1, round(sim, 2)))
+        print('Title: {}\nContent: {}'.format(title, body))
 
 #
 def train():
-    df = pd.read_table('./dataset/'+constants.ROW_CORPUS_NAME, header=None, encoding="latin1")
+    ## 1. Get user options
 
-    #
     newOrOldCorpus = input("Create new corpus? (y/N)>")
+    
+    # use a new corpus or an old one
+    if newOrOldCorpus.lower() == "y":
+        df = pd.read_table('./dataset/sample_corpus.tsv', header=None, encoding="latin1")
 
-    if (newOrOldCorpus.lower() == "y"):
         numOfDocs = int(input("Number of docs>"))
         
         p.create_new(df, numOfDocs)
         
-        corpus = pickle.load(open("dataset/"+constants.CLEANED_CORPUS_TABLE, 'rb'))
-    else:
-        corpus = pickle.load(open("dataset/"+constants.CLEANED_CORPUS_TABLE, 'rb'))
+    # load the saved corpus
+    corpus = pickle.load(open("dataset/cleaned_corpus_table", 'rb'))
 
-    #
+    ## 2. train the requested module
+
     moduleToTrain = input("Module to train (tfidf/topic/w2v)>")
 
     if moduleToTrain == "tf":
-        train_tf_idf(corpus)
+        tf_idf.train(corpus)
+    
     elif moduleToTrain == "topic":
-        train_topic(corpus)
+        lda.train(corpus)
+    
     elif moduleToTrain == "w2v":
-        train_word2vec(corpus)
+        word2vec.train(corpus)
 
+    ## 3. done
     print("Module trained.")
 
-    return
-
 def search():
-    corpus = pickle.load(open("dataset/"+constants.CLEANED_CORPUS_TABLE, 'rb'))
-
-    method = input("Search method (tf/Topic)>")
+    # Load requried data
+    corpus = pickle.load(open("dataset/cleaned_corpus_table", 'rb'))
     
     # Search
-    if (method == "tf"):
-        X = pickle.load(open("dataset/X", 'rb'))
-        tfidf_vectorizor = pickle.load(open("dataset/tfidf_vectorizor", 'rb'))
+    method = input("Search method (tf/Topic)>")
 
-        while True:
-            query = input("\nSearch query>")
+    while True:
+        query = p.clean(input("Search query>"))
+
+        if (method == "tf"):
+            X = pickle.load(open("dataset/X", 'rb'))
+            tfidf_vectorizor = pickle.load(open("dataset/tfidf_vectorizor", 'rb'))
             
-            if query == "": break
+            result = tf_idf.search(corpus.copy(), X, tfidf_vectorizor, query, 10)
 
-            query = p.clean(query)
+        else:
+            w2v_model = word2vec.Word2Vec.load("dataset/w2v_model")
+            lda_model = lda.LdaModel.load("dataset/lda_model")
+            dictionary = lda.Dictionary.load("dataset/cleaned_corpus_dictionary")
 
-            tfidf_result = search_tfidf(corpus, X, tfidf_vectorizor, query, 10)
+            word2vec_result = word2vec.search(corpus, w2v_model, query)
 
-            print_result(tfidf_result)
+            result = search_topic(corpus, lda_model, dictionary, word2vec_result, 10)
 
-    else:
-        w2v_model = Word2Vec.load("dataset/"+constants.W2V_MODEL)
-        lda_model = lda.LdaModel.load("dataset/"+constants.LDA_MODEL)
-        dictionary = Dictionary.load("dataset/"+constants.CLEANED_CORPUS_DICTIONARY)
+        # Done
+        print_result(result)
 
-        while True:
-            query = input("\nSearch query>")
-            
-            if query == "": break
-
-            query = p.clean(query)
-            
-            word2vec_result = search_word2vec(corpus, w2v_model, query)
-            topic_result = search_topic(corpus, lda_model, dictionary, word2vec_result, 10)
-
-            print_result(topic_result)
-
-    return
-
-#
+# Start the program
 trainOrSearch = input("Train or Search? (t/S)>")
 
-if (trainOrSearch == 't'):
+if trainOrSearch.lower() == "t":
     train()
+
 else:
     search()

@@ -1,8 +1,7 @@
+import pickle
 import numpy as np
 from gensim.models import Word2Vec
-import pickle
 from sklearn.metrics.pairwise import cosine_similarity
-import constants
 
 def get_embedding_w2v(w2v_model, doc_tokens):
     embeddings = []
@@ -40,8 +39,8 @@ def train(corpus):
     corpus['vector'] = corpus['cleaned'].apply(lambda x :get_embedding_w2v(x.split()))
 
     # Saving
-    w2v_model.save("dataset/"+constants.W2V_MODEL)
-    pickle.dump( corpus, open("dataset/"+constants.CLEANED_CORPUS_TABLE, "wb" ) )
+    w2v_model.save("dataset/w2v_model")
+    pickle.dump( corpus, open("dataset/cleaned_corpus_table", "wb" ) )
 
     return
 

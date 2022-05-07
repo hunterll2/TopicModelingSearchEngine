@@ -1,8 +1,10 @@
 import re
-import spacy
 import pickle
-import constants as c
+import pandas as pd
+import spacy
 nlp = spacy.load("en_core_web_sm")
+
+import constants as c
 
 # Module functions
 contractions_re = re.compile('(%s)' % '|'.join(c.CONTRACTIONS_DICT.keys()))
@@ -13,8 +15,7 @@ def expand_contractions(text, contractions_dict = c.CONTRACTIONS_DICT):
     return contractions_re.sub(replace, text)
 
 def clean(txt):
-    cleand = []
-
+    # Convert the text into lower case
     txt = txt.lower()
 
     # convert contractions into its original form
@@ -30,6 +31,7 @@ def clean(txt):
     txt = re.sub('[^a-z]', ' ', txt)
     
     # normalize each word and exclude stops, spaces, and characters
+    cleand = []
     for token in list(nlp(txt)):
         clean_token = token.lemma_
             
@@ -52,6 +54,6 @@ def create_new(df, num = 50000):
     df['cleaned'] = df['body'].apply(lambda x: clean(x))
 
     # save the new cleaned dataset
-    pickle.dump( df, open( "dataset/"+c.CLEANED_CORPUS_TABLE, "wb" ) )
+    pickle.dump( df, open( "dataset/cleaned_corpus_table", "wb" ) )
 
     return

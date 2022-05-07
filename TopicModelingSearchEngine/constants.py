@@ -1,10 +1,3 @@
-ROW_CORPUS_NAME = "sample_corpus.tsv"
-CLEANED_CORPUS_LIST = "cleaned_corpus_list_50"
-CLEANED_CORPUS_TABLE = "cleaned_corpus_table_50"
-CLEANED_CORPUS_DICTIONARY = "cleaned_corpus_dictionary_50"
-CLEANED_CORPUS_TFIDF = "cleaned_corpus_tfidf_50"
-LDA_MODEL = "lda_model"
-W2V_MODEL = "w2v_model"
 CONTRACTIONS_DICT = { "ain't": "are not","'s":" is","aren't": "are not","can't": "can not","can't've": "cannot have",
 "'cause": "because","could've": "could have","couldn't": "could not","couldn't've": "could not have",
 "didn't": "did not","doesn't": "does not","don't": "do not","hadn't": "had not","hadn't've": "had not have",
