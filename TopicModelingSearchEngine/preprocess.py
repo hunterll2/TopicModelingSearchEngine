@@ -48,9 +48,13 @@ def create_new(df, num = 50000):
     df = df.iloc[:num]
     df.columns = ['docid','url','title','body']
     df = df.dropna()
+    df.reset_index(drop=True)
 
     # for every doucment text: perform the clean preprocess
     df['cleaned'] = df['body'].apply(lambda x: clean(x))
+
+    #
+    df['list'] = df['cleaned'].apply(lambda x: x.split())
 
     # save the new cleaned dataset
     pickle.dump( df, open( "dataset/cleaned_corpus_table", "wb" ) )

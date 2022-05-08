@@ -22,7 +22,7 @@ def train(corpus, max_features=5000, max_df=0.95, min_df=2):
     pickle.dump(tfidf_vectorizor, open("dataset/tfidf_vectorizor", 'wb'))
     pickle.dump(X, open("dataset/X", 'wb'))
 
-def search(df, X, vectorizor, query, top_k=5):
+def search(df, X, vectorizor, query, top_n = 10):
     """ Vectorizes the `query` via `vectorizor` and calculates the cosine similarity of
     the `query` and `X` (all the documents) and returns the `top_k` similar documents."""
 
@@ -35,4 +35,4 @@ def search(df, X, vectorizor, query, top_k=5):
     # Sort the similar documents from the most similar to less similar
     df = df.sort_values(by='sim', ascending=False)
 
-    return df.head(top_k).reset_index(drop=True)
+    return df.head(top_n).reset_index(drop=True)
