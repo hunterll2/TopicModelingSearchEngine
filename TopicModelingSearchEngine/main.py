@@ -1,4 +1,5 @@
 import pickle
+from types import LambdaType
 import pandas as pd
 import numpy as np
 import spacy
@@ -14,48 +15,53 @@ import word2vec
 import preprocess as p
 
 # Search methods
-def search_topic(docs, lda_model, dictionary, result, numRes):
+def search_topic(df, lda_model, w2v_result):
+    # 1. Create empty list with the same size of topics
+    num_result = len(w2v_result)
+    num_topics = lda_model.num_topics
 
-    result['bow'] = result['cleaned'].apply(lambda x: list(simple_tokenize(x)))
-    result['bow'] = result['bow'].apply(lambda x: dictionary.doc2bow(x))
+    result_topics = [None] * num_result
+    
+    for i in range(num_result):
+        result_topics[i] = np.zeros(num_topics)
 
-    # Create empty list with the same size of topics
-    result_topics = [None] * result.shape[0]
-    for i in range(len(result_topics)):
-        result_topics[i] = np.zeros(lda_model.num_topics)
-
-    # 
-    for i in range(result.shape[0]):
-        doc_bow = result['bow'][i]
+    # 2. For each document: assigen its topics probability
+    for i in range(num_result):
+        doc_bow = w2v_result['bow'][i]
         doc_topics = lda_model.get_document_topics(doc_bow)
 
         for j in range(len(doc_topics)):
             topic_num = doc_topics[j][0]
             topic_probability = doc_topics[j][1]
+
             result_topics[i][topic_num] = topic_probability
 
-    # Sum all topic probability for each doc
+    # 3. Sum all topic probability for each document
     query_topics = result_topics[0]
-    for i in range(1, len(result_topics)):
+
+    for i in range(1, num_result):
         query_topics = query_topics + result_topics[i]
 
-    # Divid topic probability by doc num
+    # 4. Divid topic probability by document number
     for i in range(len(query_topics)):
         if (query_topics[i] != 0):
-            query_topics[i] = query_topics[i] / len(result_topics)
+            query_topics[i] = query_topics[i] / num_result
 
-    #
-    docs['sim'] = docs['topics'].apply(lambda x: cosine_similarity(np.array(query_topics).reshape(1, -1), np.array(x).reshape(1, -1)).item())
-    docs.sort_values(by='sim', ascending=False, inplace=True)
+    # 5. Calculate the similarity between each "document topics" and "query topics"
+    df['sim'] = df['topics'].apply(lambda x: 
+                                   cosine_similarity(np.array(query_topics).reshape(1, -1), np.array(x).reshape(1, -1)).item())
 
-    return docs.head(numRes).reset_index(drop=True)
+    # 6. Sort the documents and return only top N
+    df = df.sort_values(by='sim', ascending=False)
+
+    return df.head(num_result).reset_index(drop=True)
 
 #
-def print_result(df, top_n = 10):
-    for i in range(0, top_n):
-        sim = df['sim'][i]
-        title = df['title'][i]
-        body = df['body'][i]
+def print_result(result, top_n = 10):
+    for i in range(top_n):
+        sim = result['sim'][i]
+        title = result['title'][i]
+        body = result['body'][i]
 
         print('\nDoc {} ({}% Similarity)'.format(i+1, round(sim, 2)))
         print('Title: {}\nContent: {}'.format(title, body))

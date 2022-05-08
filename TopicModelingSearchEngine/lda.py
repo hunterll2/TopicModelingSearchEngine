@@ -1,15 +1,15 @@
 from gensim.corpora import Dictionary
 from gensim.models import LdaModel
 
-def train(corpus):
+def train(df):
     # make list of docs
-    articles = [x for x in corpus['cleaned']]
+    articles = [x for x in df['cleaned']]
 
     # Create Dictionary
     dictionary = Dictionary(articles)
 
     # Create Term-Document Frequency matrix
-    corpus = [dictionary.doc2bow(article) for article in articles]
+    docs_as_bow = [dictionary.doc2bow(article) for article in articles]
 
     # Get user config data
     print("\nEnter config data:")
@@ -20,9 +20,7 @@ def train(corpus):
 
     # Start training the lda model
     print("\nStart training the LDA model")
-    lda = LdaModel(corpus=corpus, id2word=dictionary, num_topics=num_topics, passes=passes, alpha=alpha, eta=eta)
+    lda = LdaModel(corpus=docs_as_bow, id2word=dictionary, num_topics=num_topics, passes=passes, alpha=alpha, eta=eta)
 
     # Saving
     lda.save("dataset/lda_model")
-
-    return

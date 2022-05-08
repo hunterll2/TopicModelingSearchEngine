@@ -1,6 +1,5 @@
 import re
 import pickle
-import pandas as pd
 import spacy
 nlp = spacy.load("en_core_web_sm")
 
@@ -47,13 +46,11 @@ def clean(txt):
 def create_new(df, num = 50000):
     # take a portion of the dataset
     df = df.iloc[:num]
-    df.columns=['docid','url','title','body']
+    df.columns = ['docid','url','title','body']
     df = df.dropna()
 
-    # for every doucment text perform the clean preprocess
+    # for every doucment text: perform the clean preprocess
     df['cleaned'] = df['body'].apply(lambda x: clean(x))
 
     # save the new cleaned dataset
     pickle.dump( df, open( "dataset/cleaned_corpus_table", "wb" ) )
-
-    return

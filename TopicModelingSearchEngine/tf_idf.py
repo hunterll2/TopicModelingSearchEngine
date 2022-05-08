@@ -1,5 +1,4 @@
 import pickle
-import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -23,8 +22,6 @@ def train(corpus, max_features=5000, max_df=0.95, min_df=2):
     pickle.dump(tfidf_vectorizor, open("dataset/tfidf_vectorizor", 'wb'))
     pickle.dump(X, open("dataset/X", 'wb'))
 
-    return
-
 def search(df, X, vectorizor, query, top_k=5):
     """ Vectorizes the `query` via `vectorizor` and calculates the cosine similarity of
     the `query` and `X` (all the documents) and returns the `top_k` similar documents."""
@@ -36,6 +33,6 @@ def search(df, X, vectorizor, query, top_k=5):
     df["sim"] = cosine_similarity(X, query_vec).flatten()
     
     # Sort the similar documents from the most similar to less similar
-    df.sort_values(by='sim', ascending=False, inplace=True)
+    df = df.sort_values(by='sim', ascending=False)
 
     return df.head(top_k).reset_index(drop=True)

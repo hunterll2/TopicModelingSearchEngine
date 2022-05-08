@@ -19,7 +19,7 @@ def get_embedding_w2v(w2v_model, doc_tokens):
         return np.mean(embeddings, axis=0)
 
 def train(corpus):
-    #
+    # Get documents text
     txts = [txt.split() for txt in corpus['cleaned']]
 
     # Get user config data
@@ -42,15 +42,14 @@ def train(corpus):
     w2v_model.save("dataset/w2v_model")
     pickle.dump( corpus, open("dataset/cleaned_corpus_table", "wb" ) )
 
-    return
-
-def search(corpus, w2v_model, query):
+def search(df, w2v_model, query, top_n = 10):
     # generating vector
     vector = get_embedding_w2v(w2v_model, query.split())
 
     # rank documents
-    documents=corpus[['docid','title','body', 'cleaned']].copy()
-    documents['similarity']=corpus['vector'].apply(lambda x: cosine_similarity(np.array(vector).reshape(1, -1), np.array(x).reshape(1, -1)).item())
-    documents.sort_values(by='similarity', ascending=False, inplace=True)
-  
-    return documents.head(10).reset_index(drop=True)
+    df['sim'] = df['vector'].apply(lambda x: 
+                                   cosine_similarity(np.array(vector).reshape(1, -1), np.array(x).reshape(1, -1)).item())
+    
+    df = df.sort_values(by='sim', ascending=False)
+
+    return df.head(top_n).reset_index(drop=True)
