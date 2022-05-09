@@ -1,8 +1,9 @@
-import pickle
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 def train(corpus, max_features=5000, max_df=0.95, min_df=2):
+    print("\n# Start training TF-IDF module.")
+
     docs = [x for x in corpus['cleaned']]
 
     """ Creates a tf-idf matrix for the `corpus` using sklearn.""" 
@@ -19,8 +20,10 @@ def train(corpus, max_features=5000, max_df=0.95, min_df=2):
 
     X = tfidf_vectorizor.fit_transform(docs)
 
-    pickle.dump(tfidf_vectorizor, open("dataset/tfidf_vectorizor", 'wb'))
-    pickle.dump(X, open("dataset/X", 'wb'))
+    # done
+    print("* TF-IDF module trained.")
+
+    return tfidf_vectorizor, X
 
 def search(df, X, vectorizor, query, top_n = 10):
     """ Vectorizes the `query` via `vectorizor` and calculates the cosine similarity of

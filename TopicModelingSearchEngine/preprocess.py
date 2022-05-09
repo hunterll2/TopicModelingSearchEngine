@@ -1,5 +1,4 @@
 import re
-import pickle
 import spacy
 nlp = spacy.load("en_core_web_sm")
 
@@ -44,6 +43,8 @@ def clean(txt):
     return ' '.join([str(e) for e in cleand])
 
 def create_new(df, num = 50000):
+    print("\n# Start preprocess documents.")
+
     # take a portion of the dataset
     df = df.iloc[:num]
     df.columns = ['docid','url','title','body']
@@ -53,8 +54,9 @@ def create_new(df, num = 50000):
     # for every doucment text: perform the clean preprocess
     df['cleaned'] = df['body'].apply(lambda x: clean(x))
 
-    #
+    # for every document text: convert text into list of words (for later use)
     df['list'] = df['cleaned'].apply(lambda x: x.split())
 
-    # save the new cleaned dataset
-    pickle.dump( df, open( "dataset/cleaned_corpus_table", "wb" ) )
+    # done
+    print("* Documents processed successfully.")
+    return df

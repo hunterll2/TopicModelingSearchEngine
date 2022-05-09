@@ -1,4 +1,3 @@
-import pickle
 import numpy as np
 from gensim.models import Word2Vec
 from sklearn.metrics.pairwise import cosine_similarity
@@ -19,8 +18,10 @@ def get_embedding_w2v(w2v_model, doc_tokens):
         return np.mean(embeddings, axis=0)
 
 def train(corpus):
+    print("\n# Start training Word2Vec module.")
+
     # Get documents text
-    txts = [txt.split() for txt in corpus['cleaned']]
+    txts = [x for x in corpus['list']]
 
     # Get user config data
     print("\nEnter config data:")
@@ -31,16 +32,15 @@ def train(corpus):
     workers = float(input("workers (4)>"))
 
     # traind w2v model
-    print("\nStart training word2vec model")
     w2v_model = Word2Vec(txts, vector_size=vector_size, min_count=min_count, window=window, sg=sg, workers=workers)
 
     # Create corpus vectors
-    print("\nStart createing corpus vectors")
-    corpus['vector'] = corpus['cleaned'].apply(lambda x :get_embedding_w2v(x.split()))
+    corpus['vector'] = corpus['list'].apply(lambda x :get_embedding_w2v(w2v_model, x))
 
-    # Saving
-    w2v_model.save("dataset/w2v_model")
-    pickle.dump( corpus, open("dataset/cleaned_corpus_table", "wb" ) )
+    # Done
+    print("\n* Word2Vec module trained.")
+
+    return w2v_model, corpus
 
 def search(df, w2v_model, query, top_n = 10):
     # generating vector

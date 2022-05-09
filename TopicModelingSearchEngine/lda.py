@@ -1,10 +1,11 @@
-import pickle
 import numpy as np
 from gensim.corpora import Dictionary
 from gensim.models import LdaModel
 from sklearn.metrics.pairwise import cosine_similarity
 
 def train(df):
+    print("\n# Start training LDA module.")
+
     # make list of docs
     articles = [x for x in df['list']]
 
@@ -22,12 +23,8 @@ def train(df):
     eta = float(input("Eta value (0.001)>"))
 
     # Start training the lda model
-    print("\nStart training the LDA model")
     lda = LdaModel(corpus=docs_as_bow, id2word=dictionary, num_topics=num_topics, passes=passes, alpha=alpha, eta=eta)
-
-    # Saving
-    lda.save("dataset/lda_model")
-
+    
     # Use the "LDA model" on the corpus to find the topics for each document
     df['bow'] = docs_as_bow
 
@@ -44,7 +41,10 @@ def train(df):
 
                 df['topics'][i][topic_num] = topic_probability
 
-    pickle.dump( df, open( "dataset/cleaned_corpus_table", "wb" ) )
+    # done
+    print("\n* LDA module trained.")
+
+    return lda, df
 
 def search(df, top_docs):
     num_result = len(top_docs)

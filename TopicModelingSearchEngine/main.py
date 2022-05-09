@@ -7,38 +7,47 @@ import word2vec
 
 import preprocess as p
 
+# Helpers
+def save(obj, name):
+    pickle.dump( obj, open( "dataset/" + name, "wb" ) )
+
 # Train methods
-def train():
-    ## 1. Get user options
-
-    newOrOldCorpus = input("Create new corpus? (y/N)>")
+def preprocess():
+    df = pd.read_table('dataset/sample_corpus.tsv', header=None, encoding="latin1")
     
-    # use a new corpus or an old one
-    if newOrOldCorpus.lower() == "y":
-        df = pd.read_table('./dataset/sample_corpus.tsv', header=None, encoding="latin1")
+    corpus_size = int(input("Number of docs>"))
+    
+    new_corpus = p.create_new(df, corpus_size)
 
-        numOfDocs = int(input("Number of docs>"))
-        
-        p.create_new(df, numOfDocs)
-        
+    save(new_corpus, "cleaned_corpus_table")
+
+def train():
     # load the saved corpus
     corpus = pickle.load(open("dataset/cleaned_corpus_table", 'rb'))
 
-    ## 2. train the requested module
+    # train the requested module
+    module = input("Module to train [ TFIDF (TF) / LDA / Word2Vec (w2v) / ALL ] >")
 
-    moduleToTrain = input("Module to train (tfidf/topic/w2v)>")
+    if module == "tf" or module == "all":
+        tfidf_vectorizor, X = tf_idf.train(corpus)
 
-    if moduleToTrain == "tf":
-        tf_idf.train(corpus)
+        save(tfidf_vectorizor, "tfidf_vectorizor")
+        save(X, "X")
     
-    elif moduleToTrain == "topic":
-        lda.train(corpus)
+    if module == "topic" or module == "all":
+        lda_model, edited_corpus = lda.train(corpus)
+
+        lda_model.save("dataset/lda_model")
+        save(edited_corpus, "cleaned_corpus_table")
     
-    elif moduleToTrain == "w2v":
-        word2vec.train(corpus)
+    if module == "w2v" or module == "all":
+        w2v_model, edited_corpus = word2vec.train(corpus)
+
+        w2v_model.save("dataset/w2v_model")
+        save(edited_corpus, "cleaned_corpus_table")
 
     ## 3. done
-    print("Module trained.")
+    print("\nModule\s trained.")
 
 # Seach Methods
 def search():
@@ -71,12 +80,15 @@ def search():
 def print_result(result):
     for i, doc in result.iterrows():
         print('\nDoc {} ({}% Similarity)'.format(i+1, round(doc['sim'] * 100)))
-        print('Title: {}\nContent: {}'.format(doc['title'], doc['body']))
+        print('Title: {}\nContent: {}'.format(doc['title'], doc['body'][:2000]))
 
 # Start the program
-trainOrSearch = input("Train or Search? (t/S)>")
+operation = input("Preprocess (P) / Train (T) / Search (S) >")
 
-if trainOrSearch.lower() == "t":
+if operation.lower() == "p":
+    preprocess()
+
+elif operation.lower() == "t":
     train()
 
 else:
