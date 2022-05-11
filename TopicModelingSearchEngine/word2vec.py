@@ -42,14 +42,14 @@ def train(corpus):
 
     return w2v_model, corpus
 
-def search(df, w2v_model, query, top_n = 10):
+def search(corpus, w2v_model, query, top_n = 10):
     # generating vector
     vector = get_embedding_w2v(w2v_model, query.split())
 
     # rank documents
-    df['sim'] = df['vector'].apply(lambda x: 
+    corpus['sim'] = corpus['vector'].apply(lambda x: 
                                    cosine_similarity(np.array(vector).reshape(1, -1), np.array(x).reshape(1, -1)).item())
     
-    df = df.sort_values(by='sim', ascending=False)
+    corpus = corpus.sort_values(by='sim', ascending=False)
 
-    return df.head(top_n).reset_index(drop=True)
+    return corpus.head(top_n).reset_index(drop=True)

@@ -31,32 +31,41 @@ def clean(txt):
     # normalize each word and exclude stops, spaces, and characters
     cleand = []
     for token in list(nlp(txt)):
-        clean_token = token.lemma_
-            
         if (token.is_stop): continue
         if (token.is_space): continue
         if (len(token) < 3): continue
 
-        cleand.append(clean_token)
+        cleand.append(token.lemma_)
 
     # convert the list of words into one string
-    return ' '.join([str(e) for e in cleand])
+    return ' '.join([e for e in cleand])
 
-def create_new(df, num = 50000):
+def create_new(corpus, num = 50000):
     print("\n# Start preprocess documents.")
 
+    ## 1. Preparare corpus
+
     # take a portion of the dataset
-    df = df.iloc[:num]
-    df.columns = ['docid','url','title','body']
-    df = df.dropna()
-    df.reset_index(drop=True)
+    corpus = corpus.iloc[:num]
+
+    # Set columns names ([0, 1, 2, 3] => ['id','url','title','body'])
+    corpus.columns = ['docid','url','title','body']
+
+    # Remove empty rows
+    corpus = corpus.dropna()
+    
+    # Correct index numbers
+    corpus.reset_index(drop=True)
+
+    
+    ## 2. Perform Text-Processing
 
     # for every doucment text: perform the clean preprocess
-    df['cleaned'] = df['body'].apply(lambda x: clean(x))
+    corpus['cleaned'] = corpus['body'].apply(lambda x: clean(x))
 
-    # for every document text: convert text into list of words (for later use)
-    df['list'] = df['cleaned'].apply(lambda x: x.split())
+    # for every document text: convert text into list of words ("simple text" => ["simple", "text"])
+    corpus['list'] = corpus['cleaned'].apply(lambda x: x.split())
 
     # done
     print("* Documents processed successfully.")
-    return df
+    return corpus

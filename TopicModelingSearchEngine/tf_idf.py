@@ -1,7 +1,7 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-def train(corpus, max_features=5000, max_df=0.95, min_df=2):
+def train(corpus):
     print("\n# Start training TF-IDF module.")
 
     docs = [x for x in corpus['cleaned']]
@@ -15,27 +15,28 @@ def train(corpus, max_features=5000, max_df=0.95, min_df=2):
                                        use_idf=True, 
                                        smooth_idf=True, 
                                        sublinear_tf=True,
-                                       max_df=max_df, 
-                                       min_df=min_df)
+                                       max_df=0.95, 
+                                       min_df=2,
+                                       max_features=5000)
 
-    X = tfidf_vectorizor.fit_transform(docs)
+    docs_vectors = tfidf_vectorizor.fit_transform(docs)
 
     # done
     print("* TF-IDF module trained.")
 
-    return tfidf_vectorizor, X
+    return tfidf_vectorizor, docs_vectors
 
-def search(df, X, vectorizor, query, top_n = 10):
+def search(corpus, docs_vectors, vectorizor, query, top_n = 10):
     """ Vectorizes the `query` via `vectorizor` and calculates the cosine similarity of
     the `query` and `X` (all the documents) and returns the `top_k` similar documents."""
 
     # Vectorize the query to the same length as documents
-    query_vec = vectorizor.transform([query])
+    query_vector = vectorizor.transform([query])
     
     # Compute the cosine similarity between query_vec and all the documents
-    df["sim"] = cosine_similarity(X, query_vec).flatten()
+    corpus["sim"] = cosine_similarity(docs_vectors, query_vector).flatten()
     
     # Sort the similar documents from the most similar to less similar
-    df = df.sort_values(by='sim', ascending=False)
+    corpus = corpus.sort_values(by='sim', ascending=False)
 
-    return df.head(top_n).reset_index(drop=True)
+    return corpus.head(top_n).reset_index(drop=True)

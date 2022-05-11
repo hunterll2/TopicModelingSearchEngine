@@ -3,17 +3,17 @@ from gensim.corpora import Dictionary
 from gensim.models import LdaModel
 from sklearn.metrics.pairwise import cosine_similarity
 
-def train(df):
+def train(corpus):
     print("\n# Start training LDA module.")
 
     # make list of docs
-    articles = [x for x in df['list']]
+    docs = [x for x in corpus['list']]
 
     # Create Dictionary
-    dictionary = Dictionary(articles)
+    dictionary = Dictionary(docs)
 
     # Create Term-Document Frequency matrix
-    docs_as_bow = [dictionary.doc2bow(article) for article in articles]
+    docs_as_bow = [dictionary.doc2bow(article) for article in docs]
 
     # Get user config data
     print("\nEnter config data:")
@@ -26,45 +26,44 @@ def train(df):
     lda = LdaModel(corpus=docs_as_bow, id2word=dictionary, num_topics=num_topics, passes=passes, alpha=alpha, eta=eta)
     
     # Use the "LDA model" on the corpus to find the topics for each document
-    df['bow'] = docs_as_bow
+    corpus['bow'] = docs_as_bow
 
-    df['topics'] = None
-    df['topics'] = df['topics'].apply(lambda x: np.zeros(lda.num_topics))
+    # Create new column to store for each documents its topics
+    corpus['topics'] = None
+    corpus['topics'] = corpus['topics'].apply(lambda x: np.zeros(lda.num_topics))
 
-    for i in range(len(df)):
-            doc_bow = df['bow'][i]
+    for i in range(len(corpus)):
+            doc_bow = corpus['bow'][i]
             doc_topics = lda.get_document_topics(doc_bow)
 
             for j in range(len(doc_topics)):
                 topic_num = doc_topics[j][0]
                 topic_probability = doc_topics[j][1]
 
-                df['topics'][i][topic_num] = topic_probability
+                corpus['topics'][i][topic_num] = topic_probability
 
     # done
     print("\n* LDA module trained.")
 
-    return lda, df
+    return lda, corpus
 
-def search(df, top_docs):
-    num_result = len(top_docs)
-
+def search(corpus, word2vec_result, top_n = 10):
     # 1. Sum all topic probability for each document
-    query_topics = top_docs['topics'][0]
+    query_topics = word2vec_result['topics'][0]
 
-    for i in range(1, num_result):
-        query_topics = query_topics + top_docs['topics'][i]
+    for i in range(1, len(word2vec_result)):
+        query_topics = query_topics + word2vec_result['topics'][i]
 
     # 2. Divid topic probability by document number
-    for i in range(num_result):
+    for i in range(len(query_topics)):
         if (query_topics[i] != 0):
-            query_topics[i] = query_topics[i] / num_result
+            query_topics[i] = query_topics[i] / len(word2vec_result)
 
     # 3. Calculate the similarity between each "document topics" and "query topics"
-    df['sim'] = df['topics'].apply(lambda x: 
-                                   cosine_similarity(np.array(query_topics).reshape(1, -1), np.array(x).reshape(1, -1)).item())
+    corpus['sim'] = corpus['topics'].apply(lambda doc_topics: 
+                                   cosine_similarity(np.array(query_topics).reshape(1, -1), np.array(doc_topics).reshape(1, -1)).item())
 
-    # 4. Sort the documents and return only top N
-    df = df.sort_values(by='sim', ascending=False)
+    # 4. Sort the documents and return the result
+    corpus = corpus.sort_values(by='sim', ascending=False)
 
-    return df.head(num_result).reset_index(drop=True)
+    return corpus.head(top_n).reset_index(drop=True)
