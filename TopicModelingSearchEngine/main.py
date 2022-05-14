@@ -13,7 +13,7 @@ def save(obj, name):
 
 # Train methods
 def preprocess():
-    corpus = pd.read_table('dataset/sample_corpus.tsv', header=None, encoding="latin1")
+    corpus = pd.read_table('dataset/sample_corpus.tsv', encoding="latin1")
     
     corpus_size = int(input("Number of docs>"))
     
@@ -74,7 +74,7 @@ def search():
 
         # Done
         print_result(result)
-
+          
 # Print Method
 def print_result(result):
     for i, doc in result.iterrows():

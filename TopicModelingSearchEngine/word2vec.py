@@ -21,7 +21,7 @@ def train(corpus):
     print("\n# Start training Word2Vec module.")
 
     # Get documents text
-    txts = [x for x in corpus['list']]
+    txts = list(corpus['list'])
 
     # Get user config data
     print("\nEnter config data:")

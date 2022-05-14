@@ -29,16 +29,19 @@ def clean(txt):
     txt = re.sub('[^a-z]', ' ', txt)
     
     # normalize each word and exclude stops, spaces, and characters
-    cleand = []
+    cleaned = []
     for token in list(nlp(txt)):
-        if (token.is_stop): continue
-        if (token.is_space): continue
-        if (len(token) < 3): continue
+        if (token.is_stop): 
+            continue
+        if (token.is_space): 
+            continue
+        if (len(token) < 3): 
+            continue
 
-        cleand.append(token.lemma_)
+        cleaned.append(token.lemma_)
 
     # convert the list of words into one string
-    return ' '.join([e for e in cleand])
+    return ' '.join(cleaned)
 
 def create_new(corpus, num = 50000):
     print("\n# Start preprocess documents.")

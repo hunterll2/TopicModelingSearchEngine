@@ -4,9 +4,9 @@ from sklearn.metrics.pairwise import cosine_similarity
 def train(corpus):
     print("\n# Start training TF-IDF module.")
 
-    docs = [x for x in corpus['cleaned']]
+    docs = list(corpus['cleaned'])
 
-    """ Creates a tf-idf matrix for the `corpus` using sklearn.""" 
+    # prepare tfidf_vectorizor object. used later for convert text into vectors.
     tfidf_vectorizor = TfidfVectorizer(decode_error='replace', 
                                        strip_accents='unicode', 
                                        analyzer='word',
@@ -19,6 +19,7 @@ def train(corpus):
                                        min_df=2,
                                        max_features=5000)
 
+    # Creates a tf-idf matrix for the `docs` using tfidf_vectorizor.
     docs_vectors = tfidf_vectorizor.fit_transform(docs)
 
     # done
@@ -28,7 +29,7 @@ def train(corpus):
 
 def search(corpus, docs_vectors, vectorizor, query, top_n = 10):
     """ Vectorizes the `query` via `vectorizor` and calculates the cosine similarity of
-    the `query` and `X` (all the documents) and returns the `top_k` similar documents."""
+    the `query` and `vectors` (all the documents) and returns the `top_n` similar documents."""
 
     # Vectorize the query to the same length as documents
     query_vector = vectorizor.transform([query])
@@ -39,4 +40,5 @@ def search(corpus, docs_vectors, vectorizor, query, top_n = 10):
     # Sort the similar documents from the most similar to less similar
     corpus = corpus.sort_values(by='sim', ascending=False)
 
+    # return top N document after reset the index
     return corpus.head(top_n).reset_index(drop=True)

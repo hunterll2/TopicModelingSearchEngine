@@ -6,14 +6,14 @@ from sklearn.metrics.pairwise import cosine_similarity
 def train(corpus):
     print("\n# Start training LDA module.")
 
-    # make list of docs
-    docs = [x for x in corpus['list']]
+    # make list of docs. so that [ ['word1', 'word2',..], ['word1', 'word2',..], .. ]
+    docs = list(corpus['list'])
 
     # Create Dictionary
     dictionary = Dictionary(docs)
 
     # Create Term-Document Frequency matrix
-    docs_as_bow = [dictionary.doc2bow(article) for article in docs]
+    docs_as_bow = [dictionary.doc2bow(doc) for doc in docs]
 
     # Get user config data
     print("\nEnter config data:")
